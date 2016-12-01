@@ -8,6 +8,8 @@ security:
       userAuthorizationUri: http://localhost:9999/uaa/oauth/authorize
       accessTokenUri: http://localhost:9999/uaa/oauth/token
       scope: openid
+      access-token-validity-seconds: 10
+      refresh-token-validity-seconds: 10
     resource:
       jwt:
         key-value: |

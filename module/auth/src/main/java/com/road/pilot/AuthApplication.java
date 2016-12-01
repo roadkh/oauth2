@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
@@ -62,11 +64,11 @@ public class AuthApplication {
 
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            clients.inMemory()
-                    .withClient("pilot")
-                    .secret("pilotSecret")
-                    .authorizedGrantTypes("authorization_code", "refresh_token", "password")
-                    .scopes("openid", "auth_user").autoApprove(false);
+            clients.jdbc(dataSource);
+//                    .withClient("pilot")
+//                    .secret("pilotSecret")
+//                    .authorizedGrantTypes("authorization_code", "refresh_token", "password")
+//                    .scopes("openid", "auth_user").autoApprove(false);
         }
 
         @Override
@@ -80,11 +82,17 @@ public class AuthApplication {
                     .accessTokenConverter(jwtAccessTokenConverter())
                     .tokenStore(jdbcTokenStore())
                     .approvalStore(approvalStore())
+                    .authorizationCodeServices(authorizationCodeServices())
                     ;
         }
 
         @Autowired
         DataSource dataSource;
+
+        @Bean
+        public JdbcAuthorizationCodeServices authorizationCodeServices() {
+            return new JdbcAuthorizationCodeServices(dataSource);
+        }
 
         @Bean
         public JdbcTokenStore jdbcTokenStore() {
