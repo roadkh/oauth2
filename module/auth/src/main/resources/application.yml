@@ -1,0 +1,29 @@
+debug: true
+
+security:
+  user:
+    password: 1111
+  oauth2:
+    client:
+      authorized-grant-types: authorization_code, refresh_token, password,
+      client-id: pilot
+      client-secret: pilotSecret
+      scope: openid
+server:
+  context-path: /uaa
+  port: 9999
+logging:
+  level:
+    org.springframework.security: debug
+    org.h2: debug
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    dbcp2:
+      driver-class-name: org.h2.Dirver
+      username: sa
+      password:
+
+
+
+
