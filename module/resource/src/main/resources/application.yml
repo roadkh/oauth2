@@ -17,6 +17,7 @@ security:
 #      scope: openid
 
     resource:
+#      user-info-uri: http://localhost:9999/uaa/user
       jwt:
         key-value: |
           -----BEGIN PUBLIC KEY-----

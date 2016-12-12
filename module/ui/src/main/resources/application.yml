@@ -8,15 +8,15 @@ security:
       userAuthorizationUri: http://localhost:9999/uaa/oauth/authorize
       accessTokenUri: http://localhost:9999/uaa/oauth/token
       scope: openid
-      access-token-validity-seconds: 10
-      refresh-token-validity-seconds: 10
     resource:
+#      userInfoUri: http://localhost:9999/uaa/user
       jwt:
         key-value: |
           -----BEGIN PUBLIC KEY-----
           MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvhWoP4cIOjcFxfAyCS54J41vgU85lPqTdhMBwUjRDeUKVyoJ21a6aJEC0Z2zck++TjyNo8ZLsRVlydTGJMg0jT6NaWn2HMrLg9bV/lc+NWWvnZ5C8Ak/wu9RoFyMKrh2kwrZLLted8d/q9cd1nraS1Y1ll8YP7OIXi2kOrt529bkaH2tP7TGCg52AOZmlDktEO97R7IukWVacophqOM/ld+C9LA+W68Qhx4fZTW8u4KXPqrWa2XkFmgyKKWUrzqS4bFxCpUzkLT/jKBUJty1swiAwGmjSSItY+wa3Iv5nMjy09XVrl6mGqEul3rvzYqN4SuP9NIuF2aDzqFa6h+tnwIDAQAB
           -----END PUBLIC KEY-----
-  sessions: never
+  sessions: stateless
+
 zuul:
   routes:
     user:

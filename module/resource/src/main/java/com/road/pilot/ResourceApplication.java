@@ -79,6 +79,11 @@ public class ResourceApplication extends OAuth2RestOperationsConfiguration {
         return message;
     }
 
+    @RequestMapping("/user")
+    public Principal principal(Principal principal) {
+        return principal;
+    }
+
 
     @RequestMapping("/pub")
     public Message publicMsg() {
