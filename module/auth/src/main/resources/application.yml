@@ -24,7 +24,9 @@ spring:
       driver-class-name: org.h2.Dirver
       username: sa
       password:
-
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
 
 
 

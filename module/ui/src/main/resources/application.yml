@@ -19,6 +19,9 @@ security:
 
 zuul:
   routes:
+    oauth:
+      path: /oauth/**
+      url: http://localhost:9999/uaa/oauth
     user:
       path: /user/**
       url: http://localhost:9999/uaa/user

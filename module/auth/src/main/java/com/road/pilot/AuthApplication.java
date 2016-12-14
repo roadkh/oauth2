@@ -1,5 +1,8 @@
 package com.road.pilot;
 
+import com.road.pilot.domain.User;
+import com.road.pilot.security.CustomUserDetails;
+import com.road.pilot.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,6 +14,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -91,7 +97,19 @@ public class AuthApplication {
 
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth.parentAuthenticationManager(authenticationManager);
+            auth.parentAuthenticationManager(authenticationManager)
+            .userDetailsService(userDetailsService())
+            .passwordEncoder(passwordEncoder());
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        public UserDetailsService userDetailsService() {
+            return new CustomUserDetailsService();
         }
     }
 
@@ -168,6 +186,8 @@ public class AuthApplication {
         public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
             Map<String, Object> additionalInfo = new HashMap<>();
             additionalInfo.put("test_data", "test_data");
+            CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
+            additionalInfo.put("user_id", userDetails.getId());
             ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
             return accessToken;
         }

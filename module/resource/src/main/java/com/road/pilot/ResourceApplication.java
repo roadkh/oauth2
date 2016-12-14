@@ -1,47 +1,30 @@
 package com.road.pilot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2RestOperationsConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateCustomizer;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
-import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.AccessTokenRequest;
-import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -58,6 +41,19 @@ public class ResourceApplication extends OAuth2RestOperationsConfiguration {
     @Bean
     public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
         return factory.getUserInfoRestTemplate();
+    }
+
+
+
+    @Slf4j
+    @Component
+    public static class CustomPrincipalExtractor implements PrincipalExtractor {
+
+        @Override
+        public Object extractPrincipal(Map<String, Object> map) {
+            log.debug("extract map is {}", map);
+            return map;
+        }
     }
 
     @RequestMapping("/")
@@ -125,6 +121,7 @@ public class ResourceApplication extends OAuth2RestOperationsConfiguration {
 
     @Configuration
     protected static class MvcSecurityConfiguration extends ResourceServerConfigurerAdapter {
+
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
@@ -136,6 +133,13 @@ public class ResourceApplication extends OAuth2RestOperationsConfiguration {
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
             resources.resourceId("oauth_resource");
+
+//            ((UserInfoTokenServices)resourceServerTokenServices).setPrincipalExtractor(principalExtractor());
+        }
+
+        @Bean
+        public PrincipalExtractor principalExtractor() {
+            return new CustomPrincipalExtractor();
         }
 
         //        @Override
